@@ -1,0 +1,139 @@
+<!--
+
+    bluebones.net Boggle - network-aware multiplayer word game.
+    Copyright (C) 2004-5 Thomas David Baker <bakert@gmail.com>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+-->
+<!-- 
+     The installer for this project is for Windows only and requires NSIS.
+     Run the "zip" target on any other platform.
+-->
+<project name="boggle" default="installer">
+
+    <target name="init">
+        <property name="package" value="net.bluebones.${ant.project.name}"/>
+        <property name="root.dir" value="."/>
+        <property name="src.dir" value="${root.dir}/src"/>
+        <property name="build.dir" value="${root.dir}/build"/>
+        <property name="src.resources.dir" value="${root.dir}/resources"/>
+        <property name="classes.dir" value="${build.dir}/classes"/>
+        <property name="build.resources.dir" value="${classes.dir}/resources"/>
+        <property name="docs.dir" value="${build.dir}/docs"/>
+        <property name="jar.file" value="${build.dir}/${ant.project.name}.jar"/>
+        <property name="main.class" value="${package}.Boggle"/>
+        <property name="build.zip.file" 
+            value="${build.dir}/${ant.project.name}.zip"/>
+        <property name="installer.config.file" value="${root.dir}/boggle.nsi"/>
+        <property name="build.installer.file" 
+            value="${build.dir}/BoggleInstaller.exe"/>
+        <property name="deploy.dir" value="\\rook1\f\Inetpub\wwwroot\boggle\"/>
+        <property name="deploy.installer.file"
+            value="${deploy.dir}/BoggleInstaller.exe"/>
+        <property name="deploy.zip.file" value="${deploy.dir}/boggle.zip"/>
+    </target>
+    
+    <target name="clean" depends="init">
+        <delete dir="${build.dir}" quiet="true"/>
+        <delete dir="${docs.dir}" quiet="true"/>
+    </target>
+    
+    <target name="cvsupdate">
+        <cvs cvsroot=":pserver:bluebones.net:/cvs" command="update -d"/>
+    </target>
+    
+    <target name="setup" depends="init,clean">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${docs.dir}"/>
+    </target>
+    
+    <target name="compile" depends="init,clean,setup">
+        <javac srcdir="${src.dir}"
+               destdir="${classes.dir}"
+               debug="on"
+               debuglevel="lines,vars,source"
+               deprecation="on">
+            <compilerarg line="-Xlint:all,-serial"/>
+        </javac>
+    </target>
+    
+    <target name="resources" depends="init,clean,setup">
+        <copy todir="${build.resources.dir}">
+            <fileset dir="${src.resources.dir}"/>
+        </copy>
+    </target>
+    
+    <target name="jar" depends="init,clean,setup,compile,resources">
+        <jar destfile="${jar.file}" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
+    </target>
+    
+    <target name="javadoc" depends="init,clean,setup,compile">
+        <javadoc sourcepath="${src.dir}" destdir="${docs.dir}" 
+                packagenames="${package}.*">
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="true"
+                packagelistLoc="${root.dir}/"/>
+
+        </javadoc>
+    </target>
+    
+    <target name="zip" depends="init,clean,cvsupdate,setup,compile,jar,javadoc">
+        <zip destfile="${build.zip.file}">
+            <zipfileset file="${jar.file}"/>
+            <zipfileset file="${root.dir}/COPYING"/>
+            <zipfileset file="${root.dir}/README.TXT"/>
+            <zipfileset file="${root.dir}/changes.txt"/>
+            <zipfileset dir="${docs.dir}" prefix="docs"/>
+            <zipfileset file="build.xml"/>
+            <zipfileset dir="${src.dir}" prefix="src"/>
+            <zipfileset file="boggle.nsi"/>
+        </zip>
+    </target>
+    
+    <target name="installer" 
+            depends="init,clean,cvsupdate,setup,compile,jar,javadoc,zip">
+        <exec dir="${root.dir}" executable="c:\progra~1\nsis\makensis.exe">
+            <arg line="${installer.config.file}"/>
+        </exec>
+    </target>
+    
+    <target name="deployclean">
+        <delete file="${deploy.zip.file}" quiet="true"/>
+        <delete file="${deploy.installer.file}" quiet="true"/>
+        <delete file="${deploy.dir}/changes.txt" quiet="true"/>
+        <delete dir="${deploy.dir}/src" quiet="true"/>
+        <delete dir="${deploy.dir}/docs" quiet="true"/>    
+    </target>
+    
+    <target name="deploy" 
+        depends="init,clean,cvsupdate,setup,compile,jar,javadoc,zip,installer,deployclean">
+        <copy file="${build.zip.file}" tofile="${deploy.zip.file}"/>
+        <copy file="${build.installer.file}" tofile="${deploy.installer.file}"/>
+        <copy file="${root.dir}/changes.txt" 
+            tofile="${deploy.dir}/changes.txt"/>
+        <copy todir="${deploy.dir}/src">
+            <fileset dir="${src.dir}"/>
+        </copy>
+        <copy todir="${deploy.dir}/docs">
+            <fileset dir="${docs.dir}"/>
+        </copy>
+    </target>
+
+</project>

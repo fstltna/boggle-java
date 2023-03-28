@@ -1,0 +1,46 @@
+Boggle Changelog <http://bluebones.net/boggle/> <bakert+boggle@gmail.com>
+
+Version 0.3.4
+- Removed OK button on results window as default button so that you can't accidentally close the window when typing furiously at the end of a game.
+- Set focus to word entry area explicitly on new board set so that you don't have to click in the box when the game starts sometimes, hopefully.
+- Changed Host New Game shortcuts from H to G because H not working and can't work out why.
+- Added changes.txt to the distributed zip file.
+- Thanks to Mark Lawson for his suggestions incorporated into this version.
+
+Version 0.3.3.1
+- Added Name CVS tag to see if we can use it for automatically importing version.  We can't.
+
+Version 0.3.3
+- Added the concept of "strength" not just longest word to AI players to make them playable and not too strong.
+
+Version 0.3.2
+- Fixed some issues with the installer.
+- Added deployment to bluebones.net to the build process.
+- This version is tagged v032 in CVS.
+
+Version 0.3
+- 4x4 or 5x5 board choice (dictated by host).  (Suggested by XXX.)
+- Replaced new Theme().getClass() hack in themes with Theme.class.
+- Fixed all xlint warnings (Collection typing) except SerialVersionUID warnings.
+- All missing public methods javadoc completed.
+- Improved display of fonts in die (used visual bounds rather than logical bounds to center).
+- Stopped dragging column headers in Rubber details pane.
+- Replaced all magic numbers with constants.
+- Ran various PMD checks and corrected problems <http://pmd.sourceforge.net/>.
+- New installer (NSIS) with no "unlicensed version" warning.
+- Uninstaller.
+- Ant-based build process.
+- CVS (and thus file versioning).
+- This version is tagged v03 in CVS.
+
+Version 0.2
+- Too many changes to list.  Main changes below.
+- Network or internet play for an unlimited number of players. 
+- Full scrabble words type dictionary. 
+- Results so far totalled and displayed. 
+- Alter the size, font and colour of the dice and save as themes. 
+- Alter length of a game. 
+- Computer opponents (actually they are far too good to really play but they tell you what words you could have got). 
+
+Version 0.1
+- Code written as standalone timer + board display for paper play.
